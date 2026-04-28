@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>邮政服务工具箱 · 首页导航</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Roboto', 'Microsoft YaHei', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0b3b5e 0%, #1b5a7a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 28px 20px;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(4px);
+            border-radius: 48px;
+            box-shadow: 0 25px 45px -12px rgba(0, 20, 40, 0.5);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .nav-header {
+            background: linear-gradient(105deg, #0f4c75 0%, #3282b8 100%);
+            padding: 38px 28px 32px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .nav-header h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: white;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .nav-header .tagline {
+            color: #e0f0ff;
+            font-size: 1.1rem;
+            margin-top: 12px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        .tools-grid {
+            padding: 44px 36px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 32px;
+            justify-content: center;
+        }
+
+        .tool-card {
+            flex: 1;
+            min-width: 260px;
+            background: #ffffffea;
+            border-radius: 32px;
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            border: 1px solid #d4e3f0;
+            box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            backdrop-filter: blur(2px);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 32px 40px -16px #0a2c42;
+            border-color: #9ac2dc;
+        }
+
+        .card-graphic {
+            padding: 32px 24px 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #f6fafd 0%, #ecf5fa 100%);
+            border-bottom: 2px solid #cde3f0;
+        }
+
+        .card-icon {
+            font-size: 4.2rem;
+            display: inline-block;
+            filter: drop-shadow(2px 6px 12px rgba(33, 103, 163, 0.2));
+        }
+
+        .card-graphic h2 {
+            font-size: 1.9rem;
+            font-weight: 800;
+            margin-top: 18px;
+            color: #1e4a6e;
+            letter-spacing: -0.3px;
+        }
+
+        .card-desc {
+            padding: 20px 24px 28px;
+            background: white;
+        }
+
+        .card-desc p {
+            color: #365f7a;
+            line-height: 1.45;
+            font-weight: 500;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .feature-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #e5f2f9;
+            padding: 6px 16px;
+            border-radius: 60px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1b5e7e;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .btn-entrance {
+            margin-top: 20px;
+            width: 100%;
+            background: linear-gradient(105deg, #236b92 0%, #3c8dbd 100%);
+            color: white;
+            border: none;
+            border-radius: 60px;
+            padding: 12px 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .tool-card:hover .btn-entrance {
+            background: linear-gradient(105deg, #0f5a82 0%, #2a7fae 100%);
+            transform: scale(0.98);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .info-footer {
+            background: #eef3f7;
+            padding: 20px 28px;
+            text-align: center;
+            border-top: 1px solid #cde0ec;
+            font-size: 0.85rem;
+            color: #2b607b;
+            font-weight: 500;
+        }
+
+        @media (max-width: 900px) {
+            .tools-grid { padding: 28px 20px; gap: 24px; }
+            .card-graphic h2 { font-size: 1.6rem; }
+            .nav-header h1 { font-size: 1.9rem; }
+            .nav-header { padding: 28px 20px; }
+        }
+
+        @media (max-width: 700px) {
+            .tool-card { min-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+<div class="nav-container">
+    <div class="nav-header">
+        <h1>
+            📮 邮政服务工具箱
+        </h1>
+        <div class="tagline">智能资费 · 灵活配票 · 一站通达</div>
+    </div>
+
+    <div class="tools-grid">
+        <!-- 卡片1: 国内邮政资费计价系统 -->
+        <a href="/gncsm.html" class="tool-card">
+            <div class="card-graphic">
+                <div class="card-icon">CN</div>
+                <h2>国内计价</h2>
+            </div>
+            <div class="card-desc">
+                <p>信函、明信片、印刷品、盲人读物<br>    <br>支持本埠/外埠、挂号/约投</p>
+                <div>
+                    <span class="feature-badge">一键计算</span>
+                    
+					<span class="feature-badge">挂号/约投</span>
+                </div>
+                <div class="btn-entrance">
+                    进入计价系统 <span>→</span>
+                </div>
+            </div>
+        </a>
+
+        <!-- 卡片2: 国际港澳台邮政资费计价系统 -->
+        <a href="/csm2.0.html" class="tool-card">
+            <div class="card-graphic">
+                <div class="card-icon">🌏✉️</div>
+                <h2>国际和港澳台计价</h2>
+            </div>
+            <div class="card-desc">
+                <p>依据中国邮政2019年10月官方标准，支持航空、SAL、水陆路，涵盖全球200+国家及港澳台地区</p>
+                <div>
+                    <span class="feature-badge">精准分区</span>
+                    <span class="feature-badge">挂号+平邮</span>
+                    <span class="feature-badge">克重阶梯</span>
+                </div>
+                <div class="btn-entrance">
+                    进入计价系统 <span>→</span>
+                </div>
+            </div>
+        </a>
+
+        <!-- 卡片3: 智能邮票计算器 -->
+        <a href="/stamp.html" class="tool-card">
+            <div class="card-graphic">
+                <div class="card-icon">📮🧮</div>
+                <h2>配票系统</h2>
+            </div>
+            <div class="card-desc">
+                <p>智能邮票搭配引擎，灵活选择面值，最少张数精确组合，支持超额最小方案</p>
+                <div>
+                    <span class="feature-badge">一键计算</span>
+                    <span class="feature-badge">最优解算法</span>
+                    <span class="feature-badge">超额提醒</span>
+                </div>
+                <div class="btn-entrance">
+                    进入配票系统 <span>→</span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="info-footer">
+		工具数据均基于中国邮政标准开发<br>
+        点击卡片跳转 | 版本 3.5<br>
+		技术支持：迪科·西普&Dr.保
+    </div>
+</div>
+
+<script>
+    (function(){
+        const cards = document.querySelectorAll('.tool-card');
+        cards.forEach(card => {
+            card.addEventListener('click', (e) => {
+                const toolName = card.querySelector('.card-graphic h2')?.innerText || '邮政工具';
+                console.log(`🔍 正在跳转至: ${toolName}`);
+            });
+        });
+    })();
+</script>
+</body>
+</html>

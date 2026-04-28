@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>智能邮票计算</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', 'Microsoft YaHei', system-ui, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0b3b5e 0%, #1b5a7a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 860px;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(4px);
+            border-radius: 32px;
+            box-shadow: 0 25px 40px -8px rgba(0, 20, 40, 0.35);
+            overflow: hidden;
+            padding: 32px 28px;
+            transition: max-width 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        @media (min-width: 768px) {
+            .container { padding: 36px 40px; }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        h1 {
+            color: #1e3c5c;
+            font-size: 2.1rem;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #0f4c75, #3282b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #4a6572;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .available-stamps {
+            background: #e8f0fe;
+            border-radius: 24px;
+            padding: 20px 18px;
+            margin-bottom: 28px;
+            border: 1px solid #bbd4f0;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.02), 0 6px 10px -4px rgba(33, 103, 163, 0.12);
+        }
+
+        .stamps-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .stamps-header h3 {
+            color: #1e4e6f;
+            font-size: 1.3rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .select-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: 1.5px solid #2c6280;
+            color: #2c6280;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+            background-color: rgba(255,255,255,0.5);
+        }
+
+        .action-btn:hover {
+            background: #2c6280;
+            color: white;
+            border-color: #2c6280;
+        }
+
+        .stamps-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 10px;
+            justify-content: flex-start;
+        }
+
+        .stamp-chip {
+            padding: 10px 18px;
+            background: white;
+            color: #1e3c5c;
+            border-radius: 48px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            min-width: 70px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.04);
+            border: 2px solid #bdd3e8;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.15s;
+            background: rgba(255,255,255,0.9);
+        }
+
+        .stamp-chip:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -5px rgba(21,80,120,0.2);
+            border-color: #3282b8;
+        }
+
+        .stamp-chip.selected {
+            background: #1e5a7c;
+            border-color: #0d3550;
+            color: white;
+            box-shadow: 0 8px 14px -6px #0b3b5e;
+        }
+
+        .input-section {
+            background: white;
+            border-radius: 24px;
+            padding: 24px 22px;
+            margin-bottom: 28px;
+            box-shadow: 0 8px 18px -6px rgba(0,30,50,0.12);
+            border: 1px solid #d9e5f0;
+        }
+
+        .input-group {
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 12px;
+            color: #1e4158;
+            font-weight: 650;
+            font-size: 1.1rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px 18px;
+            border: 2.5px solid #cbdae6;
+            border-radius: 60px;
+            font-size: 1.3rem;
+            text-align: center;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.25s;
+            background: #fbfdff;
+            color: #0a2a3b;
+        }
+
+        input:focus {
+            border-color: #1e6f9f;
+            box-shadow: 0 0 0 4px rgba(30,111,159,0.2);
+            background: white;
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(105deg, #0f4c75 0%, #3282b8 100%);
+            color: white;
+            border: none;
+            border-radius: 60px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 12px 20px -8px #0b3b5e;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 18px 25px -10px #0a3145;
+            background: linear-gradient(105deg, #1a5f8a 0%, #3f94c7 100%);
+        }
+
+        .result-section {
+            background: #e2f0e6;
+            border-radius: 24px;
+            padding: 24px 20px;
+            border: 1px solid #bcd0c2;
+            margin-top: 12px;
+            display: none;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.8), 0 8px 14px -6px #1b4b3c1a;
+        }
+
+        .result-section.active {
+            display: block;
+            animation: fadeIn 0.4s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+
+        .result-title {
+            color: #1d543b;
+            font-size: 1.5rem;
+            font-weight: 750;
+        }
+
+        .stamp-count {
+            padding: 8px 22px;
+            background: #1e7e4c;
+            color: white;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .stamp-combination {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px 20px;
+            justify-content: center;
+            margin: 28px 0 20px;
+        }
+
+        .stamp-used {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(145deg, #1e7e4c, #2a9d5e);
+            border-radius: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 12px 16px -6px #0f3d2b;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #f5fff0;
+        }
+
+        .stamp-used:before {
+            content: "";
+            position: absolute;
+            top: -40%;
+            left: -40%;
+            width: 180%;
+            height: 180%;
+            background: radial-gradient(circle, rgba(255,255,250,0.5) 0%, rgba(255,255,240,0) 75%);
+            transform: rotate(25deg);
+        }
+
+        .stamp-value {
+            font-size: 1.9rem;
+            font-weight: 800;
+            z-index: 2;
+            line-height: 1.2;
+        }
+
+        .stamp-unit {
+            font-size: 0.8rem;
+            z-index: 2;
+            opacity: 0.9;
+        }
+
+        .no-solution {
+            background: #ffe6e6;
+            border-radius: 30px;
+            padding: 18px;
+            text-align: center;
+            color: #b13e3e;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: 2px dashed #d99;
+            margin: 20px 0 10px;
+        }
+
+        .overage-info {
+            background: #fef7e6;
+            border-radius: 24px;
+            padding: 18px 20px;
+            margin: 18px 0 10px;
+            border-left: 8px solid #e6a020;
+            color: #5e3f0e;
+            font-weight: 500;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.02);
+        }
+
+        .overage-badge {
+            display: inline-block;
+            background: #d48f1c;
+            color: white;
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            margin-left: 12px;
+        }
+
+        .explanation {
+            margin-top: 28px;
+            background: #fbf3e0;
+            border-radius: 20px;
+            padding: 18px 20px;
+            font-size: 0.95rem;
+            color: #3a3a2a;
+            border-left: 6px solid #c9a53b;
+        }
+
+        .footer-copyright {
+            margin-top: 32px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #345e77;
+            border-top: 1px dashed #b0c8da;
+            padding-top: 22px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 20px 16px; }
+            h1 { font-size: 1.8rem; }
+            .stamp-chip { padding: 8px 14px; font-size: 1rem; min-width: 60px; }
+            .stamp-used { width: 70px; height: 70px; }
+            .stamp-value { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>✉️ 邮智配票 · 灵活配票</h1>
+        <p class="subtitle">最少张数 计算</p>
+    </header>
+
+    <!-- 可选择面值 -->
+    <div class="available-stamps">
+        <div class="stamps-header">
+            <h3> 请先点选可用面值</h3>
+            <div class="select-actions">
+                <button class="action-btn" id="selectAllBtn" type="button">全选</button>
+                <button class="action-btn" id="clearAllBtn" type="button">清空</button>
+            </div>
+        </div>
+        <div id="stamps-selector" class="stamps-container"></div>
+        <p style="font-size:0.9rem; margin-top:16px; color:#2c5a73;">点击面值切换 (高亮=已选)，可以先清空全部面值再选择<br>
+    </div>
+
+    <div class="input-section">
+        <div class="input-group">
+            <label for="postage">总邮费 (元)</label>
+            <input type="number" id="postage" min="0.1" max="500" step="0.1" placeholder=" " >
+        </div>
+        <button id="calculate-btn">计算最优组合</button>
+    </div>
+
+    <div class="result-section" id="result-section">
+        <div class="result-header">
+            <div class="result-title" id="result-title-text"> 最佳搭配</div>
+            <div class="stamp-count">共 <span id="stamp-count">0</span> 张</div>
+        </div>
+        <div id="stamp-combination" class="stamp-combination"></div>
+        
+        <!-- 无解/超额提示区域 -->
+        <div id="message-area"></div>
+
+       
+
+    <div class="footer-copyright">
+        © 2026 邮智配票 · 智能引擎 | 
+        <a href="#" onclick="return false;">版本 2.65</a> ·
+        <br><span style="opacity:0.8; font-size:0.8rem;">本项目由迪科·西普提供技术支持</span><br>
+		<a href="/index.html" style="color: inherit; text-decoration: underline;">返回首页</a>
+    </div>
+</div>
+
+<script>
+    (function(){
+        "use strict";
+
+        const ALL_STAMPS = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1.0, 1.2, 1.5, 2.0, 2.4, 2.6, 3.0, 4.2, 4.5, 5.0, 6.0];
+        
+        const stampsContainer = document.getElementById('stamps-selector');
+        const postageInput = document.getElementById('postage');
+        const calculateBtn = document.getElementById('calculate-btn');
+        const resultSection = document.getElementById('result-section');
+        const stampCombinationEl = document.getElementById('stamp-combination');
+        const stampCountSpan = document.getElementById('stamp-count');
+        const resultTitleText = document.getElementById('result-title-text');
+        const messageArea = document.getElementById('message-area');
+        const selectAllBtn = document.getElementById('selectAllBtn');
+        const clearAllBtn = document.getElementById('clearAllBtn');
+
+        let selectedStamps = new Set();   // 存储字符串形式 "0.1"
+
+        // 渲染面值卡片
+        function renderStampChips() {
+            stampsContainer.innerHTML = '';
+            ALL_STAMPS.forEach(value => {
+                const chip = document.createElement('div');
+                chip.className = 'stamp-chip';
+                chip.textContent = value.toFixed(1) + '元';
+                chip.dataset.value = value;
+                chip.dataset.key = value.toFixed(1);
+                chip.classList.add('selected');
+                selectedStamps.add(value.toFixed(1));
+                
+                chip.addEventListener('click', () => {
+                    const key = chip.dataset.key;
+                    if (chip.classList.contains('selected')) {
+                        chip.classList.remove('selected');
+                        selectedStamps.delete(key);
+                    } else {
+                        chip.classList.add('selected');
+                        selectedStamps.add(key);
+                    }
+                });
+                stampsContainer.appendChild(chip);
+            });
+        }
+
+        function updateChipsFromSet() {
+            document.querySelectorAll('.stamp-chip').forEach(chip => {
+                const key = chip.dataset.key;
+                chip.classList.toggle('selected', selectedStamps.has(key));
+            });
+        }
+
+        function selectAllStamps() {
+            ALL_STAMPS.forEach(v => selectedStamps.add(v.toFixed(1)));
+            updateChipsFromSet();
+        }
+
+        function clearAllStamps() {
+            selectedStamps.clear();
+            updateChipsFromSet();
+        }
+
+        function getSelectedValues() {
+            return Array.from(selectedStamps).map(parseFloat).sort((a,b) => b - a);
+        }
+
+        // ----- 核心：精确组合 (dp) -----
+        function exactCombination(target, available) {
+            const totalCents = Math.round(target * 10);
+            const stampCents = available.map(s => Math.round(s * 10));
+            const dp = new Array(totalCents + 1).fill(Number.MAX_SAFE_INTEGER);
+            const path = new Array(totalCents + 1).fill(-1);
+            dp[0] = 0;
+            
+            for (let i = 1; i <= totalCents; i++) {
+                for (let j = 0; j < stampCents.length; j++) {
+                    const sc = stampCents[j];
+                    if (i >= sc && dp[i - sc] !== Number.MAX_SAFE_INTEGER) {
+                        if (dp[i - sc] + 1 < dp[i]) {
+                            dp[i] = dp[i - sc] + 1;
+                            path[i] = j;
+                        }
+                    }
+                }
+            }
+            
+            if (dp[totalCents] === Number.MAX_SAFE_INTEGER) return null;
+            
+            const comb = [];
+            let rem = totalCents;
+            while (rem > 0) {
+                const idx = path[rem];
+                comb.push(available[idx]);
+                rem -= Math.round(available[idx] * 10);
+            }
+            comb.sort((a,b) => b - a);
+            return { combination: comb, totalValue: target, stampCount: comb.length };
+        }
+
+        // ----- 超额查找：从target向上搜索，返回最小超额组合 (优先超额最小，同等超额下张数最少) -----
+        function findMinOverageCombination(target, available) {
+            const maxSearchExtra = 50;  // 最多多搜索5元 (50单位)
+            const startCents = Math.round(target * 10);
+            const availableCents = available.map(s => Math.round(s * 10));
+            
+            // 预计算dp表到可能的最大值 (一次性扩展，提高效率)
+            const maxCents = startCents + maxSearchExtra;
+            const dp = new Array(maxCents + 1).fill(Number.MAX_SAFE_INTEGER);
+            const path = new Array(maxCents + 1).fill(-1);
+            dp[0] = 0;
+            
+            for (let i = 1; i <= maxCents; i++) {
+                for (let j = 0; j < availableCents.length; j++) {
+                    const sc = availableCents[j];
+                    if (i >= sc && dp[i - sc] !== Number.MAX_SAFE_INTEGER) {
+                        if (dp[i - sc] + 1 < dp[i]) {
+                            dp[i] = dp[i - sc] + 1;
+                            path[i] = j;
+                        }
+                    }
+                }
+            }
+            
+            // 从startCents+1开始找第一个可组合的金额
+            for (let cents = startCents + 1; cents <= maxCents; cents++) {
+                if (dp[cents] !== Number.MAX_SAFE_INTEGER) {
+                    // 回溯组合
+                    const comb = [];
+                    let rem = cents;
+                    while (rem > 0) {
+                        const idx = path[rem];
+                        comb.push(available[idx]);
+                        rem -= Math.round(available[idx] * 10);
+                    }
+                    comb.sort((a,b) => b - a);
+                    const overageValue = cents / 10;
+                    return {
+                        combination: comb,
+                        totalValue: overageValue,
+                        stampCount: comb.length,
+                        overage: overageValue - target,
+                        isExact: false
+                    };
+                }
+            }
+            return null; // 超出搜索范围仍无解
+        }
+
+        // 显示组合（精确或超额）
+        function displayCombination(result, targetPostage) {
+            stampCombinationEl.innerHTML = '';
+            messageArea.innerHTML = '';
+            
+            if (!result) {
+                // 完全无解 (搜索范围内)
+                resultTitleText.textContent = '❌ 无法组合';
+                stampCountSpan.textContent = '0';
+                messageArea.innerHTML = `<div class="no-solution">⚠️ 当前面值无法组合该邮费，且未找到合理超额方案 (最多多搜索20元)。</div>`;
+                return;
+            }
+            
+            const { combination, totalValue, stampCount, overage, isExact = (overage === undefined || overage === 0) } = result;
+            
+            if (isExact) {
+                resultTitleText.textContent = '✅ 精确搭配';
+            } else {
+                resultTitleText.textContent = `📈 最小超额 · 超出 ${overage.toFixed(1)} 元`;
+            }
+            
+            stampCountSpan.textContent = stampCount;
+            
+            // 统计每种面值
+            const countMap = new Map();
+            combination.forEach(v => {
+                const key = v.toFixed(1);
+                countMap.set(key, (countMap.get(key) || 0) + 1);
+            });
+            const sortedKeys = Array.from(countMap.keys()).map(Number).sort((a,b) => b - a);
+            
+            sortedKeys.forEach(val => {
+                const cnt = countMap.get(val.toFixed(1));
+                for (let i = 0; i < cnt; i++) {
+                    const stampEl = document.createElement('div');
+                    stampEl.className = 'stamp-used';
+                    stampEl.innerHTML = `<div class="stamp-value">${val.toFixed(1)}</div><div class="stamp-unit">元</div>`;
+                    stampCombinationEl.appendChild(stampEl);
+                }
+            });
+            
+            // 超额信息卡片
+            if (!isExact) {
+                const overageMsg = `
+                    <div class="overage-info">
+                        <strong>📌 超额配票说明</strong> 
+                        <span class="overage-badge">+${overage.toFixed(1)}元</span><br>
+                        目标邮费 ${targetPostage.toFixed(1)} 元无法精确组合。<br>
+                        当前提供最小超额方案：总面值 <strong>${totalValue.toFixed(1)} 元</strong>，
+                        超出 <strong>${overage.toFixed(1)} 元</strong>，使用 <strong>${stampCount} 张</strong>邮票。
+                    </div>
+                `;
+                messageArea.innerHTML = overageMsg;
+            } else {
+                // 精确时也可显示一条清爽信息
+                messageArea.innerHTML = `<div style="color:#1d543b; padding:6px 0; font-weight:500;">精确匹配</div>`;
+            }
+        }
+
+        // 主计算流程
+        function calculateAndDisplay() {
+            const raw = postageInput.value.trim();
+            if (!raw) { alert('请输入邮费'); return; }
+            const postage = parseFloat(raw);
+            if (isNaN(postage) || postage < 0.05) { alert('邮费需 ≥0.1元'); return; }
+            
+            const selected = getSelectedValues();
+            if (selected.length === 0) { alert('请至少选择一种面值'); return; }
+            
+            resultSection.classList.add('active');
+            
+            // 1. 尝试精确组合
+            const exact = exactCombination(postage, selected);
+            if (exact) {
+                displayCombination({ ...exact, isExact: true }, postage);
+                return;
+            }
+            
+            // 2. 无精确，尝试超额搜索
+            const overageResult = findMinOverageCombination(postage, selected);
+            if (overageResult) {
+                displayCombination(overageResult, postage);
+            } else {
+                // 完全失败
+                displayCombination(null, postage);
+            }
+        }
+
+        // 初始化
+        function init() {
+            renderStampChips();
+            
+            calculateBtn.addEventListener('click', calculateAndDisplay);
+            postageInput.addEventListener('keypress', (e) => { if(e.key==='Enter') { e.preventDefault(); calculateAndDisplay(); }});
+            selectAllBtn.addEventListener('click', selectAllStamps);
+            clearAllBtn.addEventListener('click', clearAllStamps);
+            
+            setTimeout(() => calculateAndDisplay(), 60);
+        }
+
+        init();
+    })();
+</script>
+</body>
+</html>

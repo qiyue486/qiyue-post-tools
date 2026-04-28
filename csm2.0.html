@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>国际港澳台邮政资费 · 智能计价</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', 'Microsoft YaHei', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0b3b5e 0%, #1b5a7a 100%);
+            min-height: 100vh;
+            padding: 32px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .postage-card {
+            max-width: 920px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(4px);
+            border-radius: 32px;
+            box-shadow: 0 25px 40px -8px rgba(0, 20, 40, 0.4);
+            overflow: hidden;
+            transition: all 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .card-header {
+            background: linear-gradient(105deg, #0f4c75 0%, #3282b8 100%);
+            padding: 28px 24px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .card-header h1 {
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .card-header .sub {
+            color: #d9ecff;
+            margin-top: 8px;
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
+
+        .card-body {
+            padding: 32px 28px;
+        }
+
+        .form-group {
+            margin-bottom: 28px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 12px;
+            color: #1e4158;
+            font-weight: 650;
+            font-size: 1.1rem;
+            letter-spacing: -0.2px;
+        }
+
+        .search-wrapper {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 18px;
+            border: 2.5px solid #cbdae6;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.25s;
+            background: #fbfdff;
+            color: #0a2a3b;
+        }
+
+        .search-input:focus {
+            border-color: #1e6f9f;
+            box-shadow: 0 0 0 4px rgba(30,111,159,0.2);
+        }
+
+        .dropdown-list {
+            position: absolute;
+            z-index: 30;
+            width: 100%;
+            margin-top: 8px;
+            background: white;
+            border-radius: 24px;
+            border: 1px solid #bfd8ec;
+            box-shadow: 0 12px 25px -12px rgba(0,0,0,0.2);
+            max-height: 280px;
+            overflow-y: auto;
+            backdrop-filter: blur(2px);
+        }
+
+        .dropdown-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-weight: 500;
+            color: #1f4868;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .dropdown-item:hover {
+            background: #e6f2fc;
+            color: #0f4c75;
+        }
+
+        .custom-select {
+            width: 100%;
+            padding: 16px 18px;
+            border: 2.5px solid #cbdae6;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: 500;
+            background: #fbfdff;
+            color: #0a2a3b;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%233282b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+            background-repeat: no-repeat;
+            background-position: right 20px center;
+        }
+
+        .custom-select:focus {
+            border-color: #1e6f9f;
+            box-shadow: 0 0 0 4px rgba(30,111,159,0.2);
+        }
+
+        .warning-text {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: #d9534f;
+            font-weight: 500;
+            padding-left: 10px;
+            background: #fff3f0;
+            display: inline-block;
+            border-radius: 40px;
+            padding: 5px 14px;
+        }
+
+        .primary-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(105deg, #0f4c75 0%, #3282b8 100%);
+            color: white;
+            border: none;
+            border-radius: 60px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 12px 20px -8px #0b3b5e;
+            margin-top: 6px;
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 25px -10px #0a3145;
+            background: linear-gradient(105deg, #1a5f8a 0%, #3f94c7 100%);
+        }
+
+        .result-panel {
+            background: #e2f0e6;
+            border-radius: 28px;
+            padding: 24px 24px;
+            margin-top: 24px;
+            border: 1px solid #bcd0c2;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.7), 0 8px 14px -6px #1b4b3c1a;
+            transition: all 0.3s;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            border-bottom: 2px dashed #9bbc9c;
+            padding-bottom: 12px;
+        }
+
+        .result-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #1d543b;
+        }
+
+        .price-total {
+            background: #1e7e4c;
+            color: white;
+            padding: 8px 22px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: 1px;
+        }
+
+        .details-grid {
+            background: #ffffffc9;
+            border-radius: 28px;
+            padding: 18px 20px;
+            margin: 16px 0;
+            backdrop-filter: blur(3px);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #d0e2d4;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #2a5e4a;
+        }
+
+        .detail-value {
+            color: #10432f;
+            font-weight: 700;
+        }
+
+        .final-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-top: 18px;
+            background: #eef6ea;
+            padding: 16px 20px;
+            border-radius: 40px;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #0b593a;
+        }
+
+        .footer-note {
+            margin-top: 28px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #3e6f53;
+            border-top: 1px dashed #c0dbc0;
+            padding-top: 20px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 580px) {
+            .card-body { padding: 22px 18px; }
+            .result-title { font-size: 1.3rem; }
+            .price-total { font-size: 1rem; padding: 5px 16px; }
+            .final-price { font-size: 1.1rem; }
+        }
+
+        .hidden-init {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="postage-card">
+    <div class="card-header">
+        <h1>
+            📮 国际港澳台邮政资费
+        </h1>
+        <div class="sub">依据2019年10月29日中国邮政官方标准 · 精准计价</div>
+    </div>
+
+    <div class="card-body">
+        <!-- 地区搜索模块 -->
+        <div class="form-group">
+            <label class="form-label">🌍 寄达地区</label>
+            <div class="search-wrapper">
+                <input type="text" id="regionSearchInput" placeholder="搜索国家/地区，如 美国、香港..." class="search-input" autocomplete="off">
+                <div id="regionDropdownMenu" class="dropdown-list hidden-init"></div>
+            </div>
+            <input type="hidden" id="selectedRegionHidden" value="">
+        </div>
+
+        <!-- 寄递类型 -->
+        <div class="form-group">
+            <label class="form-label">📬 寄递类型</label>
+            <select id="deliveryTypeSelect" class="custom-select">
+                <option value="">请选择类型</option>
+                <option value="letter">平信</option>
+                <option value="postcard">平明信片</option>
+                <option value="registered_letter">挂号信</option>
+                <option value="registered_postcard">挂号明信片</option>
+                <option value="print">平常印刷品</option>
+                <option value="registered_print">挂号印刷品</option>
+            </select>
+        </div>
+
+        <!-- 寄递方式 -->
+        <div class="form-group">
+            <label class="form-label">✈️ 寄递方式</label>
+            <select id="deliveryMethodSelect" class="custom-select">
+                <option value="">请选择方式</option>
+                <option value="surface">水陆路</option>
+                <option value="sal">SAL (空运水陆路)</option>
+                <option value="air">航空</option>
+            </select>
+            <div id="methodMsg" class="warning-text hidden-init"></div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">重量 (克)</label>
+            <input type="number" id="weightInput" placeholder="请输入邮件重量，单位克" min="0.1" step="0.1" class="search-input" value="20">
+        </div>
+
+        <button id="calcTriggerBtn" class="primary-btn">计算资费</button>
+
+        <!-- 结果展示区域 -->
+        <div id="resultContainer" class="result-panel hidden-init">
+            <div class="result-header">
+                <div class="result-title">📬 邮资明细</div>
+                <div class="price-total" id="totalPriceDisplay">¥ 0.00</div>
+            </div>
+            <div class="details-grid">
+                <div class="detail-row"><span class="detail-label">寄往地区</span><span class="detail-value" id="resRegion">—</span></div>
+                <div class="detail-row"><span class="detail-label">寄递类型</span><span class="detail-value" id="resType">—</span></div>
+                <div class="detail-row"><span class="detail-label">寄递方式</span><span class="detail-value" id="resMethod">—</span></div>
+                <div class="detail-row"><span class="detail-label">邮件重量</span><span class="detail-value" id="resWeight">—</span></div>
+                <div class="final-price">
+                    <span>总资费 (人民币)</span>
+                    <span id="finalPriceSpan">¥ 0.00</span>
+                </div>
+                <div id="regTip" style="font-size:0.75rem; color:#3f6b48; margin-top: 8px; text-align:center;"></div>
+            </div>
+        </div>
+        <div class="footer-note">
+            资费依据中国邮政2019年10月29日标准 | 挂号费统一+16元<br>
+            部分地区邮路不通，请以网点实际维护关系为准<br>
+			<a href="/index.html" style="color: inherit; text-decoration: underline;">返回首页</a>
+        </div>
+    </div>
+</div>
+
+<!-- 引入外部地区数据 JS -->
+<script src="regions.js"></script>
+
+<script>
+    // ========== 资费配置 ==========
+    const fees = {
+        hkmt: {
+            letter: [{ max:20, price:1.50 },{ max:50, price:2.80 },{ max:100, price:4.00 },
+                     { max:250, price:8.50 },{ max:500, price:16.70 },{ max:1000, price:31.70 },{ max:2000, price:55.80 }],
+            postcard: 3.50,
+            print: { first: 3.50, add: 1.30 },
+            airFee: { per10g: 0.50, postcard: 0.50 },
+            registration: 16.00
+        },
+        international: {
+            registration: 16.00,
+            air: {
+                letter: { groups: { 1: { first:5.00, add:1.00 }, 2: { first:5.50, add:1.50 }, 3: { first:6.00, add:1.80 }, 4: { first:7.00, add:2.30 } } },
+                postcard: 5.00,
+                print: { groups: { 1: { first:4.50, add:2.20 }, 2: { first:5.00, add:2.50 }, 3: { first:6.00, add:2.80 } } }
+            },
+            sal: {
+                letter: { groups: { 1: { first:4.50, add:0.50 }, 2: { first:5.00, add:0.60 }, 3: { first:5.50, add:0.70 }, 4: { first:6.50, add:0.80 } } },
+                postcard: 4.50,
+                print: { groups: { 1: { first:4.00, add:1.90 }, 2: { first:4.50, add:2.20 }, 3: { first:5.00, add:2.50 } } }
+            },
+            surface: {
+                letter: { normal: { first:4.00, add:0.50 }, special: { first:3.50, add:0.40 } },
+                postcard: 3.50,
+                print: { first: 3.50, add: 1.80 }
+            }
+        }
+    };
+
+    // ========== DOM 元素 ==========
+    const regionSearch = document.getElementById('regionSearchInput');
+    const regionDropdown = document.getElementById('regionDropdownMenu');
+    const selectedRegionHidden = document.getElementById('selectedRegionHidden');
+    const deliveryType = document.getElementById('deliveryTypeSelect');
+    const deliveryMethod = document.getElementById('deliveryMethodSelect');
+    const methodWarning = document.getElementById('methodMsg');
+    const weightInput = document.getElementById('weightInput');
+    const calcBtn = document.getElementById('calcTriggerBtn');
+    const resultDiv = document.getElementById('resultContainer');
+    const resRegionSpan = document.getElementById('resRegion');
+    const resTypeSpan = document.getElementById('resType');
+    const resMethodSpan = document.getElementById('resMethod');
+    const resWeightSpan = document.getElementById('resWeight');
+    const finalPriceSpan = document.getElementById('finalPriceSpan');
+    const totalPriceDisplay = document.getElementById('totalPriceDisplay');
+    const regTipDiv = document.getElementById('regTip');
+
+    let currentRegionObj = null;
+
+    // ========== 渲染下拉列表 ==========
+    function renderRegionDropdown(filterText = '') {
+        const lowerQuery = filterText.toLowerCase();
+        const filtered = lowerQuery ? regionsData.filter(r => r.name.toLowerCase().includes(lowerQuery)) : regionsData;
+        regionDropdown.innerHTML = '';
+        if (filtered.length === 0) {
+            regionDropdown.innerHTML = '<div class="dropdown-item">未找到匹配地区</div>';
+            regionDropdown.classList.remove('hidden-init');
+            return;
+        }
+        filtered.forEach(reg => {
+            const item = document.createElement('div');
+            item.className = 'dropdown-item';
+            item.innerText = reg.name;
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                selectRegion(reg);
+                regionDropdown.classList.add('hidden-init');
+            });
+            regionDropdown.appendChild(item);
+        });
+        regionDropdown.classList.remove('hidden-init');
+    }
+
+    // ========== 选择地区 ==========
+    function selectRegion(region) {
+        regionSearch.value = region.name;
+        selectedRegionHidden.value = region.name;
+        currentRegionObj = region;
+        updateMethodWarning(region);
+        regionDropdown.classList.add('hidden-init');
+    }
+
+    // ========== 更新寄递方式选项（根据地区限制）==========
+    function updateMethodWarning(region) {
+        const salOption = deliveryMethod.querySelector('option[value="sal"]');
+        const airOption = deliveryMethod.querySelector('option[value="air"]');
+        const surfaceOption = deliveryMethod.querySelector('option[value="surface"]');
+        
+        // 重置所有选项
+        if (salOption) salOption.disabled = false;
+        if (airOption) airOption.disabled = false;
+        if (surfaceOption) surfaceOption.disabled = false;
+        methodWarning.classList.add('hidden-init');
+        
+        let disabledList = [];
+        const restrictions = region.disabledMethods || [];
+        
+        // 应用限制
+        if (restrictions.includes('sal') && salOption) { salOption.disabled = true; disabledList.push('SAL'); }
+        if (restrictions.includes('air') && airOption) { airOption.disabled = true; disabledList.push('航空'); }
+        if (restrictions.includes('surface') && surfaceOption) { surfaceOption.disabled = true; disabledList.push('水陆路'); }
+        
+        // 港澳台额外限制（SAL不可用）
+        if (region.type === 'hkmt' && salOption) {
+            salOption.disabled = true;
+            if (!disabledList.includes('SAL')) disabledList.push('SAL');
+        }
+        
+        if (disabledList.length) {
+            methodWarning.innerText = `⚠️ 提示：${region.name} 暂不支持 ${disabledList.join('、')} 寄递方式`;
+            methodWarning.classList.remove('hidden-init');
+        }
+        
+        // 清空被禁用的选中项
+        if (deliveryMethod.value === 'sal' && salOption?.disabled) deliveryMethod.value = '';
+        if (deliveryMethod.value === 'air' && airOption?.disabled) deliveryMethod.value = '';
+        if (deliveryMethod.value === 'surface' && surfaceOption?.disabled) deliveryMethod.value = '';
+    }
+
+    // ========== 港澳台资费计算 ==========
+    function calculateHKMT(region, type, method, weight) {
+        let base = 0;
+        const h = fees.hkmt;
+        if (type === 'letter' || type === 'registered_letter') {
+            for (let tier of h.letter) {
+                if (weight <= tier.max) { base = tier.price; break; }
+            }
+        } else if (type === 'postcard' || type === 'registered_postcard') {
+            base = h.postcard;
+        } else if (type === 'print' || type === 'registered_print') {
+            if (weight <= 20) base = h.print.first;
+            else { const extra = weight - 20; const units = Math.ceil(extra / 10); base = h.print.first + units * h.print.add; }
+        }
+        if (method === 'air') {
+            if (type.includes('postcard')) base += h.airFee.postcard;
+            else { const airUnits = Math.ceil(weight / 10); base += airUnits * h.airFee.per10g; }
+        }
+        return base;
+    }
+
+    // ========== 国际资费计算 ==========
+    function calculateInternational(region, type, method, weight) {
+        const intl = fees.international;
+        let price = 0;
+        if (method === 'air') {
+            const group = region.airGroup;
+            const air = intl.air;
+            if (type === 'letter' || type === 'registered_letter') {
+                const g = air.letter.groups[group];
+                if (weight <= 20) price = g.first;
+                else { const extra = weight - 20; const units = Math.ceil(extra / 10); price = g.first + units * g.add; }
+            } else if (type === 'postcard' || type === 'registered_postcard') {
+                price = air.postcard;
+            } else if (type === 'print' || type === 'registered_print') {
+                const pg = Math.min(group, 3);
+                const g = air.print.groups[pg];
+                if (weight <= 20) price = g.first;
+                else { const extra = weight - 20; const units = Math.ceil(extra / 10); price = g.first + units * g.add; }
+            }
+        } else if (method === 'sal') {
+            const group = region.salGroup;
+            const sal = intl.sal;
+            if (type === 'letter' || type === 'registered_letter') {
+                const g = sal.letter.groups[group];
+                if (weight <= 20) price = g.first;
+                else { const extra = weight - 20; const units = Math.ceil(extra / 10); price = g.first + units * g.add; }
+            } else if (type === 'postcard' || type === 'registered_postcard') {
+                price = sal.postcard;
+            } else if (type === 'print' || type === 'registered_print') {
+                const pg = Math.min(group, 3);
+                const g = sal.print.groups[pg];
+                if (weight <= 20) price = g.first;
+                else { const extra = weight - 20; const units = Math.ceil(extra / 10); price = g.first + units * g.add; }
+            }
+        } else if (method === 'surface') {
+            const sf = intl.surface;
+            if (type === 'letter' || type === 'registered_letter') {
+                const letterFee = region.isSpecialSurface ? sf.letter.special : sf.letter.normal;
+                if (weight <= 20) price = letterFee.first;
+                else { const extra = weight - 20; const units = Math.ceil(extra / 10); price = letterFee.first + units * letterFee.add; }
+            } else if (type === 'postcard' || type === 'registered_postcard') {
+                price = sf.postcard;
+            } else if (type === 'print' || type === 'registered_print') {
+                if (weight <= 20) price = sf.print.first;
+                else { const extra = weight - 20; const units = Math.ceil(extra / 10); price = sf.print.first + units * sf.print.add; }
+            }
+        }
+        return price;
+    }
+
+    // ========== 主计算函数 ==========
+    function computeTotal() {
+        const regionName = selectedRegionHidden.value;
+        const typeVal = deliveryType.value;
+        const methodVal = deliveryMethod.value;
+        const weightRaw = parseFloat(weightInput.value);
+
+        if (!regionName) { alert('请选择寄往地区'); return false; }
+        if (!typeVal) { alert('请选择寄递类型'); return false; }
+        if (!methodVal) { alert('请选择寄递方式'); return false; }
+        if (!weightRaw || weightRaw <= 0) { alert('请输入有效重量（克）'); return false; }
+
+        const region = regionsData.find(r => r.name === regionName);
+        if (!region) { alert('地区数据异常'); return false; }
+
+        // 检查寄递方式是否被禁用
+        const restrictions = region.disabledMethods || [];
+        if (restrictions.includes(methodVal)) {
+            const methodName = methodVal === 'air' ? '航空' : (methodVal === 'sal' ? 'SAL' : '水陆路');
+            alert(`❌ ${regionName} 暂不支持 ${methodName} 寄递方式，请选择其他方式。`);
+            return false;
+        }
+        // 港澳台SAL额外检查
+        if (region.type === 'hkmt' && methodVal === 'sal') {
+            alert(`❌ ${regionName} 暂不支持 SAL 寄递方式，请选择水陆路或航空。`);
+            return false;
+        }
+
+        let base = 0;
+        if (region.type === 'hkmt') {
+            base = calculateHKMT(region, typeVal, methodVal, weightRaw);
+        } else {
+            base = calculateInternational(region, typeVal, methodVal, weightRaw);
+        }
+
+        let isRegistered = typeVal.startsWith('registered_');
+        let regFee = 0;
+        if (isRegistered) {
+            if (region.type === 'hkmt') regFee = fees.hkmt.registration;
+            else regFee = fees.international.registration;
+        }
+        const total = base + regFee;
+
+        // 更新UI
+        const typeNames = { 
+            'letter':'平信', 'postcard':'平常明信片', 'registered_letter':'挂号信',
+            'registered_postcard':'挂号明信片', 'print':'平常印刷品', 'registered_print':'挂号印刷品' 
+        };
+        const methodNames = { 'surface':'水陆路', 'sal':'SAL (空运水陆路)', 'air':'航空' };
+        
+        resRegionSpan.innerText = regionName;
+        resTypeSpan.innerText = typeNames[typeVal] || typeVal;
+        resMethodSpan.innerText = methodNames[methodVal] || methodVal;
+        resWeightSpan.innerText = weightRaw + ' 克';
+        finalPriceSpan.innerText = `¥ ${total.toFixed(2)}`;
+        totalPriceDisplay.innerText = `¥ ${total.toFixed(2)}`;
+        regTipDiv.innerText = isRegistered ? `✓ 含挂号费 ${regFee.toFixed(2)} 元` : `不含挂号附加费 (平邮)`;
+        
+        resultDiv.classList.remove('hidden-init');
+        return true;
+    }
+
+    // ========== 初始化 ==========
+    function initUI() {
+        // 确保 regionsData 已从外部 JS 加载
+        if (typeof regionsData === 'undefined') {
+            console.error('地区数据加载失败，请确保 regions.js 文件存在');
+            alert('地区数据加载失败，请刷新页面重试');
+            return;
+        }
+        
+        regionSearch.addEventListener('focus', () => {
+            renderRegionDropdown(regionSearch.value);
+        });
+        
+        regionSearch.addEventListener('input', (e) => {
+            renderRegionDropdown(e.target.value);
+        });
+        
+        document.addEventListener('click', (e) => {
+            if (!regionSearch.contains(e.target) && !regionDropdown.contains(e.target)) {
+                regionDropdown.classList.add('hidden-init');
+            }
+        });
+        
+        calcBtn.addEventListener('click', computeTotal);
+        
+        deliveryMethod.addEventListener('change', () => {
+            if (currentRegionObj) updateMethodWarning(currentRegionObj);
+        });
+        
+        // 不自动预设地区，留空让用户选择
+        // 如果已经有选中地区，可以触发一次警告更新
+        if (selectedRegionHidden.value && currentRegionObj) {
+            updateMethodWarning(currentRegionObj);
+        }
+    }
+    
+    // 等待 DOM 和 regions.js 都加载完成
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initUI);
+    } else {
+        initUI();
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>国内信函资费计价系统 · 中国邮政</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', 'Microsoft YaHei', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0b5e3b 0%, #1a7a4a 100%);
+            min-height: 100vh;
+            padding: 32px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 主容器卡片风格 - 与国际版保持一致 */
+        .postage-card {
+            max-width: 880px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(4px);
+            border-radius: 32px;
+            box-shadow: 0 25px 40px -8px rgba(0, 30, 15, 0.4);
+            overflow: hidden;
+            transition: all 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .card-header {
+            background: linear-gradient(105deg, #0d6b3e 0%, #2e9c62 100%);
+            padding: 28px 24px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .card-header h1 {
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .card-header .sub {
+            color: #d9ffea;
+            margin-top: 8px;
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
+
+        .card-body {
+            padding: 32px 28px;
+        }
+
+        .form-group {
+            margin-bottom: 28px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 12px;
+            color: #1e5840;
+            font-weight: 650;
+            font-size: 1.05rem;
+            letter-spacing: -0.2px;
+        }
+
+        /* 圆润选择框与输入框 */
+        .custom-select {
+            width: 100%;
+            padding: 16px 18px;
+            border: 2.5px solid #cbdae6;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: 500;
+            background: #fbfdff;
+            color: #0a2a3b;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%232e9c62' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+            background-repeat: no-repeat;
+            background-position: right 20px center;
+        }
+
+        .custom-select:focus {
+            border-color: #2e9c62;
+            box-shadow: 0 0 0 4px rgba(46,156,98,0.2);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 18px;
+            border: 2.5px solid #cbdae6;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.25s;
+            background: #fbfdff;
+            color: #0a2a3b;
+        }
+
+        .search-input:focus {
+            border-color: #2e9c62;
+            box-shadow: 0 0 0 4px rgba(46,156,98,0.2);
+        }
+
+        /* 按钮渐变主按钮 */
+        .primary-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(105deg, #0d6b3e 0%, #2e9c62 100%);
+            color: white;
+            border: none;
+            border-radius: 60px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 12px 20px -8px #0b5e3b;
+            margin-top: 6px;
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 25px -10px #0a4a2e;
+            background: linear-gradient(105deg, #158a4a 0%, #3cb87a 100%);
+        }
+
+        /* 结果区域 */
+        .result-panel {
+            background: #e8f5ed;
+            border-radius: 28px;
+            padding: 24px 24px;
+            margin-top: 24px;
+            border: 1px solid #bed9c9;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.7), 0 8px 14px -6px #1b4b3c1a;
+            transition: all 0.3s;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            border-bottom: 2px dashed #9bc0a8;
+            padding-bottom: 12px;
+        }
+
+        .result-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #1d543b;
+        }
+
+        .price-total {
+            background: #1e7e4c;
+            color: white;
+            padding: 8px 22px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: 1px;
+        }
+
+        .details-grid {
+            background: #ffffffc9;
+            border-radius: 28px;
+            padding: 18px 20px;
+            margin: 16px 0;
+            backdrop-filter: blur(3px);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #d0e2d4;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #2a5e4a;
+        }
+
+        .detail-value {
+            color: #10432f;
+            font-weight: 700;
+        }
+
+        .final-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-top: 18px;
+            background: #eef6ea;
+            padding: 16px 20px;
+            border-radius: 40px;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #0b593a;
+        }
+
+        .footer-note {
+            margin-top: 28px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #3e6f53;
+            border-top: 1px dashed #c0dbc0;
+            padding-top: 20px;
+            font-weight: 500;
+        }
+
+        .hidden-init {
+            display: none;
+        }
+
+        @media (max-width: 580px) {
+            .card-body { padding: 22px 18px; }
+            .result-title { font-size: 1.3rem; }
+            .price-total { font-size: 1rem; padding: 5px 16px; }
+            .final-price { font-size: 1.1rem; }
+        }
+
+        /* 辅助提示色 */
+        .info-badge {
+            background: #e0f0e6;
+            border-radius: 40px;
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            color: #2d6a4f;
+            display: inline-block;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+<div class="postage-card">
+    <div class="card-header">
+        <h1>
+            📮 国内信函资费
+        </h1>
+        <div class="sub">依据中国邮政官方资费标准 · 精准计价</div>
+    </div>
+
+    <div class="card-body">
+        <!-- 邮件类型 -->
+        <div class="form-group">
+            <label class="form-label">📬 邮件类型</label>
+            <select id="mailType" class="custom-select">
+                <option value="">请选择邮件类型</option>
+                <option value="postcard">明信片</option>
+                <option value="letter">平常信函</option>
+                <option value="print">印刷品</option>
+                <option value="braille">盲人读物</option>
+                <option value="registered_postcard">约投挂号明信片</option>
+                <option value="registered_letter">约投挂号信函</option>
+            </select>
+        </div>
+
+        <!-- 寄递范围（本埠/外埠） -->
+        <div id="rangeGroup" class="form-group">
+            <label class="form-label">📍 寄递范围</label>
+            <select id="mailRange" class="custom-select">
+                <option value="local">本埠 (市內互寄)</option>
+                <option value="foreign">外埠 (跨省市)</option>
+            </select>
+        </div>
+
+        <!-- 是否挂号（约投类自动隐藏） -->
+        <div id="registeredGroup" class="form-group">
+            <label class="form-label">📌 是否挂号</label>
+            <select id="isRegistered" class="custom-select">
+                <option value="no">平邮 (不加挂号费)</option>
+                <option value="yes">挂号信函 (+3元挂号费)</option>
+            </select>
+        </div>
+
+        <!-- 重量（明信片/盲人读物/约投明信片不计重量） -->
+        <div id="weightGroup" class="form-group">
+            <label class="form-label">⚖️ 邮件重量 (克)</label>
+            <input type="number" id="weight" placeholder="请输入重量，单位：克" min="0" step="1" class="search-input" value="20">
+            <div class="info-badge">📌 信函100克内每20克计费，超过100克每100克加收；印刷品100克内基准，超出每100克加收</div>
+        </div>
+
+        <button id="calculateBtn" class="primary-btn">💰 计算资费</button>
+
+        <!-- 结果展示区域 -->
+        <div id="resultContainer" class="result-panel hidden-init">
+            <div class="result-header">
+                <div class="result-title">📬 邮资明细</div>
+                <div class="price-total" id="totalPriceDisplay">¥ 0.00</div>
+            </div>
+            <div class="details-grid">
+                <div class="detail-row"><span class="detail-label">邮件类型</span><span class="detail-value" id="resType">—</span></div>
+                <div class="detail-row"><span class="detail-label">寄递范围</span><span class="detail-value" id="resRange">—</span></div>
+                <div class="detail-row"><span class="detail-label">邮件重量</span><span class="detail-value" id="resWeight">—</span></div>
+                <div class="detail-row"><span class="detail-label">挂号/约投费用</span><span class="detail-value" id="resRegistered">—</span></div>
+                <div class="final-price">
+                    <span>总资费 (人民币)</span>
+                    <span id="finalPriceSpan">¥ 0.00</span>
+                </div>
+                <div id="extraDesc" style="font-size:0.75rem; color:#3f6b48; margin-top: 8px; text-align:center;"></div>
+            </div>
+        </div>
+        <div class="footer-note">
+            资费依据中国邮政国内标准 | 本埠指市內互寄，外埠指跨省市<br>
+            盲人读物不计重量；约投挂号含约投费2元+挂号费3元<br>
+			<a href="/index.html" style="color: inherit; text-decoration: underline;">返回首页</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 资费配置（完全保留原逻辑，优化展示）
+    const fees = {
+        postcard: {
+            base: 0.8,
+            registeredFee: 3
+        },
+        letter: {
+            segments: [
+                { max: 20, local: 0.8, foreign: 1.2 },
+                { max: 40, local: 1.6, foreign: 2.4 },
+                { max: 60, local: 2.4, foreign: 3.6 },
+                { max: 80, local: 3.2, foreign: 4.8 },
+                { max: 100, local: 4.0, foreign: 6.0 }
+            ],
+            addLocal: 1.2,
+            addForeign: 2.0,
+            registeredFee: 3
+        },
+        print: {
+            baseLocal: 0.8,
+            baseForeign: 1.2,
+            addLocal: 0.4,
+            addForeign: 0.7,
+            registeredFee: 3
+        },
+        braille: {
+            base: 0,
+            registeredFee: 3
+        },
+        registered_postcard: {
+            base: 5.8,
+            description: "约投挂号明信片（含约投费2元+挂号费3元）"
+        },
+        registered_letter: {
+            baseSegments: [
+                { max: 20, local: 5.8, foreign: 6.2 }
+            ],
+            description: "约投挂号信函（含约投费2元+挂号费3元）"
+        }
+    };
+
+    // DOM 元素
+    const mailType = document.getElementById('mailType');
+    const rangeGroup = document.getElementById('rangeGroup');
+    const mailRange = document.getElementById('mailRange');
+    const registeredGroup = document.getElementById('registeredGroup');
+    const isRegistered = document.getElementById('isRegistered');
+    const weightGroup = document.getElementById('weightGroup');
+    const weightInput = document.getElementById('weight');
+    const calculateBtn = document.getElementById('calculateBtn');
+    const resultDiv = document.getElementById('resultContainer');
+    const resTypeSpan = document.getElementById('resType');
+    const resRangeSpan = document.getElementById('resRange');
+    const resWeightSpan = document.getElementById('resWeight');
+    const resRegisteredSpan = document.getElementById('resRegistered');
+    const finalPriceSpan = document.getElementById('finalPriceSpan');
+    const totalPriceDisplay = document.getElementById('totalPriceDisplay');
+    const extraDescDiv = document.getElementById('extraDesc');
+
+    // 监听邮件类型变化，控制界面显示（保留原始逻辑但增加样式一致性）
+    function toggleFormVisibility() {
+        const type = mailType.value;
+        
+        // 默认全部显示
+        rangeGroup.classList.remove('hidden-init');
+        registeredGroup.classList.remove('hidden-init');
+        weightGroup.classList.remove('hidden-init');
+        
+        // 特殊类型隐藏重量栏 (明信片、盲人读物、约投挂号明信片)
+        if (type === 'postcard' || type === 'braille' || type === 'registered_postcard') {
+            weightGroup.classList.add('hidden-init');
+        }
+        // 约投挂号明信片/信函 时隐藏“是否挂号”选项，因为已包含挂号费
+        if (type === 'registered_postcard' || type === 'registered_letter') {
+            registeredGroup.classList.add('hidden-init');
+        }
+        // 盲人读物没有寄递范围区分
+        if (type === 'braille') {
+            rangeGroup.classList.add('hidden-init');
+        }
+        // 额外：如果重量组可见但为空时预设默认值方便体验
+        if (!weightGroup.classList.contains('hidden-init') && (!weightInput.value || weightInput.value <= 0)) {
+            weightInput.value = 20;
+        }
+    }
+
+    // 信函资费
+    function calculateLetterFee(weight, range) {
+        const letterFees = fees.letter;
+        for (const seg of letterFees.segments) {
+            if (weight <= seg.max) {
+                return range === 'local' ? seg.local : seg.foreign;
+            }
+        }
+        const extraWeight = weight - 100;
+        const extraSegments = Math.ceil(extraWeight / 100);
+        const baseFee = range === 'local' ? 4.0 : 6.0;
+        const addFee = range === 'local' ? letterFees.addLocal : letterFees.addForeign;
+        return baseFee + (extraSegments * addFee);
+    }
+
+    // 印刷品资费
+    function calculatePrintFee(weight, range) {
+        const printFees = fees.print;
+        if (weight <= 100) {
+            return range === 'local' ? printFees.baseLocal : printFees.baseForeign;
+        }
+        const extraWeight = weight - 100;
+        const extraSegments = Math.ceil(extraWeight / 100);
+        const baseFee = range === 'local' ? printFees.baseLocal : printFees.baseForeign;
+        const addFee = range === 'local' ? printFees.addLocal : printFees.addForeign;
+        return baseFee + (extraSegments * addFee);
+    }
+
+    // 约投挂号信函（超过20g按信函补充）
+    function calculateRegisteredLetterFee(weight, range) {
+        if (weight <= 20) {
+            return range === 'local' ? 5.8 : 6.2;
+        }
+        const letterBaseFee = calculateLetterFee(weight, range);
+        // 约投挂号信函首重20g费用与普通信函差值  (5.8-普通首重本埠0.8=5.0 或 外埠6.2-1.2=5.0)
+        const extraFee = 5.0;
+        return letterBaseFee + extraFee;
+    }
+
+    // 主计算
+    function calculate() {
+        const type = mailType.value;
+        const range = mailRange.value;
+        const registered = isRegistered.value === 'yes';
+        let weight = parseFloat(weightInput.value);
+        
+        if (!type) {
+            alert('请选择邮件类型');
+            return;
+        }
+        
+        // 对于不需要重量的类型，强制重量为0用于展示
+        const noWeightTypes = ['postcard', 'braille', 'registered_postcard'];
+        if (noWeightTypes.includes(type)) {
+            weight = 0;
+        } else {
+            if (isNaN(weight) || weight <= 0) {
+                alert('请输入有效的邮件重量（克）');
+                return;
+            }
+            // 重量向上取整保留整数（邮局按克计费逻辑，但实际分档；此处保留原始逻辑计算）
+            weight = Math.ceil(weight);
+        }
+        
+        let basePrice = 0;
+        let registeredPrice = 0;
+        let extraDescription = '';
+        
+        switch(type) {
+            case 'postcard':
+                basePrice = fees.postcard.base;
+                if (registered) registeredPrice = fees.postcard.registeredFee;
+                extraDescription = registered ? '含挂号费3元' : '平邮寄递不加挂号';
+                break;
+            case 'letter':
+                basePrice = calculateLetterFee(weight, range);
+                if (registered) registeredPrice = fees.letter.registeredFee;
+                extraDescription = registered ? '加挂号费3元，更安全可追踪' : '平信资费，无挂号';
+                break;
+            case 'print':
+                basePrice = calculatePrintFee(weight, range);
+                if (registered) registeredPrice = fees.print.registeredFee;
+                extraDescription = registered ? '挂号印刷品+3元' : '平常印刷品';
+                break;
+            case 'braille':
+                basePrice = fees.braille.base;
+                if (registered) registeredPrice = fees.braille.registeredFee;
+                extraDescription = '盲人读物免收基本资费，若挂号仅收挂号费';
+                break;
+            case 'registered_postcard':
+                basePrice = fees.registered_postcard.base;
+                registeredPrice = 0; // 已包含
+                extraDescription = fees.registered_postcard.description;
+                break;
+            case 'registered_letter':
+                basePrice = calculateRegisteredLetterFee(weight, range);
+                registeredPrice = 0;
+                extraDescription = fees.registered_letter.description;
+                break;
+            default:
+                alert('未支持的邮件类型');
+                return;
+        }
+        
+        const total = basePrice + registeredPrice;
+        
+        // 渲染结果UI
+        const typeNames = {
+            'postcard': '明信片',
+            'letter': '信函',
+            'print': '印刷品',
+            'braille': '盲人读物',
+            'registered_postcard': '约投挂号明信片',
+            'registered_letter': '约投挂号信函'
+        };
+        const rangeNames = {
+            'local': '本埠 (市内)',
+            'foreign': '外埠 (跨省市)'
+        };
+        resTypeSpan.innerText = typeNames[type] || type;
+        resRangeSpan.innerText = (type === 'braille') ? '全国 (无区分)' : rangeNames[range];
+        
+        // 重量展示
+        if (noWeightTypes.includes(type)) {
+            resWeightSpan.innerText = '不计重量';
+        } else {
+            resWeightSpan.innerText = weight + ' 克';
+        }
+        
+        // 挂号/约投费用显示
+        if (type === 'registered_postcard' || type === 'registered_letter') {
+            resRegisteredSpan.innerText = '已包含 (约投+挂号)';
+        } else if (registeredPrice > 0) {
+            resRegisteredSpan.innerText = `¥ ${registeredPrice.toFixed(2)} (挂号费)`;
+        } else {
+            resRegisteredSpan.innerText = '无附加费';
+        }
+        
+        finalPriceSpan.innerText = `¥ ${total.toFixed(2)}`;
+        totalPriceDisplay.innerText = `¥ ${total.toFixed(2)}`;
+        extraDescDiv.innerText = extraDescription;
+        
+        resultDiv.classList.remove('hidden-init');
+    }
+    
+    // 监听类型变化时重置结果并调整表单
+    function onTypeChange() {
+        toggleFormVisibility();
+        // 若结果区域可见且用户切换类型，建议隐藏结果（重新计算后再显示）
+        resultDiv.classList.add('hidden-init');
+        // 重置重量显示默认值
+        const type = mailType.value;
+        const noWeightTypes = ['postcard', 'braille', 'registered_postcard'];
+        if (!noWeightTypes.includes(type) && (!weightInput.value || weightInput.value <= 0)) {
+            weightInput.value = 20;
+        }
+        if (noWeightTypes.includes(type)) {
+            weightInput.value = '';
+        }
+    }
+    
+    // 绑定事件及初始化
+    document.addEventListener('DOMContentLoaded', () => {
+        toggleFormVisibility();
+        mailType.addEventListener('change', onTypeChange);
+        calculateBtn.addEventListener('click', calculate);
+        weightInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') calculate();
+        });
+        // 预设一个默认计算展现（可选，但为用户提供示例）
+        setTimeout(() => {
+            if (mailType.value === '') {
+                // 默认展示信函示例
+                mailType.value = 'letter';
+                onTypeChange();
+            }
+            calculate();
+        }, 50);
+    });
+</script>
+</body>
+</html>
